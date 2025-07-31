@@ -8,6 +8,7 @@
  */
 
 import {ai} from '@/ai/genkit';
+import {getYouTubeTranscriptTool} from '@/ai/tools/youtube';
 import {z} from 'genkit';
 
 const AnalyzeJoJoConnectionInputSchema = z.union([
@@ -34,11 +35,14 @@ export async function analyzeJoJoConnection(input: AnalyzeJoJoConnectionInput): 
 
 const analyzeJoJoConnectionPrompt = ai.definePrompt({
   name: 'analyzeJoJoConnectionPrompt',
+  tools: [getYouTubeTranscriptTool],
   input: {schema: AnalyzeJoJoConnectionInputSchema},
   output: {schema: AnalyzeJoJoConnectionOutputSchema},
   prompt: `You are an expert on JoJo's Bizarre Adventure. Your task is to find creative and compelling connections between a user's input and the world of JoJo's Bizarre Adventure.
 
   The user will provide an input of type {{{type}}}. Based on this input, identify key subjects, concepts, entities, and themes. Then, brainstorm direct and indirect connections to the JJBA universe (manga, anime, characters, Stands, plot points, author inspirations, music references, etc.).
+
+  If the input is a YouTube URL, use the getYouTubeTranscript tool to fetch the transcript and analyze its content.
 
   Select the most compelling connection and explain it step-by-step, as if telling a fascinating story. Structure the explanation with a title, a short summary, and a detailed path of connection. Cite specific examples from JJBA.
 
