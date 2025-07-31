@@ -130,7 +130,7 @@ export default function StandConnectorPage() {
                 width={100}
                 height={100}
                 className="animate-float"
-                data-ai-hint="Jotaro Kujo"
+                data-ai-hint="Jotaro Kujo dancing"
             />
         </div>
         <p>Powered by the inexplicable energy of Hamon and Google Gemini.</p>
