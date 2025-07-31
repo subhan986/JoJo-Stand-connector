@@ -53,7 +53,7 @@ export default function StandConnectorPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground font-body">
-      <audio ref={audioRef} src="/jotaro-funky-lofi.mp3" loop preload="auto" />
+      <audio ref={audioRef} src="/Jotaro Theme but it's FUNKY LOFI HIP HOP (Chill Beats to Yare Yare Daze To) [6SxmlFORXmI].mp3" loop preload="auto" />
       <main className="flex-grow container mx-auto px-4 py-8 md:py-12">
         <div className="max-w-3xl mx-auto">
           <header className="text-center mb-8">
