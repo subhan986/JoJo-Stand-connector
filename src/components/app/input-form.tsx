@@ -24,6 +24,7 @@ const toBase64 = (file: File): Promise<string> =>
   });
 
 export default function InputForm({ onSubmit, isLoading }: InputFormProps) {
+  const [activeTab, setActiveTab] = useState('text');
   const [text, setText] = useState('');
   const [url, setUrl] = useState('');
   const [file, setFile] = useState<File | null>(null);
@@ -44,7 +45,6 @@ export default function InputForm({ onSubmit, isLoading }: InputFormProps) {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const activeTab = (e.target as HTMLFormElement).dataset.activeTab || 'text';
     
     let input: AnalyzeJoJoConnectionInput;
 
@@ -84,7 +84,7 @@ export default function InputForm({ onSubmit, isLoading }: InputFormProps) {
         <CardDescription>Enter any concept, link, or file to start the analysis.</CardDescription>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="text" className="w-full">
+        <Tabs defaultValue="text" className="w-full" onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="text"><Text className="w-4 h-4 mr-2"/>Text</TabsTrigger>
             <TabsTrigger value="url"><Link className="w-4 h-4 mr-2"/>URL</TabsTrigger>
@@ -92,8 +92,7 @@ export default function InputForm({ onSubmit, isLoading }: InputFormProps) {
             <TabsTrigger value="file"><File className="w-4 h-4 mr-2"/>File</TabsTrigger>
           </TabsList>
           <form onSubmit={handleSubmit} className="mt-4">
-            <TabsContent value="text" data-state>
-                <div data-active-tab="text"/>
+            <TabsContent value="text">
                 <Textarea
                     placeholder="e.g., 'The Mona Lisa', 'Quantum Physics', 'Taylor Swift'..."
                     value={text}
@@ -104,7 +103,6 @@ export default function InputForm({ onSubmit, isLoading }: InputFormProps) {
                 />
             </TabsContent>
             <TabsContent value="url">
-                <div data-active-tab="url"/>
                 <Input
                     type="url"
                     placeholder="https://example.com"
@@ -115,7 +113,6 @@ export default function InputForm({ onSubmit, isLoading }: InputFormProps) {
                 />
             </TabsContent>
             <TabsContent value="image">
-                <div data-active-tab="image"/>
                 <Label htmlFor="image-upload" className="sr-only">Upload Image</Label>
                 <Input
                     id="image-upload"
@@ -126,7 +123,6 @@ export default function InputForm({ onSubmit, isLoading }: InputFormProps) {
                 />
             </TabsContent>
             <TabsContent value="file">
-                <div data-active-tab="file"/>
                 <Label htmlFor="file-upload" className="sr-only">Upload File</Label>
                 <Input
                     id="file-upload"
