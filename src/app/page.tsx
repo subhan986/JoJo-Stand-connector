@@ -1,6 +1,7 @@
 'use client';
 
 import { useTransition, useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 import type { AnalyzeJoJoConnectionOutput, AnalyzeJoJoConnectionInput } from '@/ai/flows/analyze-jojo-connection';
 import { submitForAnalysis } from '@/app/actions';
 import InputForm from '@/components/app/input-form';
@@ -122,6 +123,16 @@ export default function StandConnectorPage() {
         </div>
       </main>
       <footer className="text-center py-4 text-sm text-muted-foreground relative">
+        <div className="absolute bottom-2 left-4 h-24 w-24">
+            <Image 
+                src="https://placehold.co/100x100.png" 
+                alt="Dancing Jotaro" 
+                width={100}
+                height={100}
+                className="animate-float"
+                data-ai-hint="Jotaro Kujo"
+            />
+        </div>
         <p>Powered by the inexplicable energy of Hamon and Google Gemini.</p>
          <div className="absolute bottom-2 right-4 flex items-center gap-4">
             <Button
