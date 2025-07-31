@@ -7,8 +7,9 @@ import InputForm from '@/components/app/input-form';
 import ResultsDisplay from '@/components/app/results-display';
 import LoadingIndicator from '@/components/app/loading-indicator';
 import { useToast } from '@/hooks/use-toast';
-import { Sparkles, Music, VolumeX, SkipForward } from 'lucide-react';
+import { Sparkles, Music, VolumeX, SkipForward, Volume2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Slider } from '@/components/ui/slider';
 
 const tracks = [
   {
@@ -28,6 +29,7 @@ export default function StandConnectorPage() {
 
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true); // Autoplay by default
+  const [volume, setVolume] = useState(1);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
@@ -42,6 +44,12 @@ export default function StandConnectorPage() {
         }
     }
   }, [currentTrackIndex]);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
+  }, [volume]);
 
 
   const handleFormSubmit = async (input: AnalyzeJoJoConnectionInput) => {
@@ -74,6 +82,10 @@ export default function StandConnectorPage() {
   
   const playNextTrack = () => {
     setCurrentTrackIndex((prevIndex) => (prevIndex + 1) % tracks.length);
+  };
+  
+  const handleVolumeChange = (value: number[]) => {
+    setVolume(value[0]);
   };
 
   return (
@@ -111,7 +123,7 @@ export default function StandConnectorPage() {
       </main>
       <footer className="text-center py-4 text-sm text-muted-foreground relative">
         <p>Powered by the inexplicable energy of Hamon and Google Gemini.</p>
-         <div className="absolute bottom-2 right-4 flex items-center gap-2">
+         <div className="absolute bottom-2 right-4 flex items-center gap-4">
             <Button
                 variant="ghost"
                 size="icon"
@@ -128,6 +140,16 @@ export default function StandConnectorPage() {
             >
                 <SkipForward className="h-5 w-5 text-muted-foreground hover:text-accent" />
             </Button>
+            <div className="flex items-center gap-2 w-32">
+              <Volume2 className="h-5 w-5 text-muted-foreground" />
+              <Slider
+                defaultValue={[1]}
+                max={1}
+                step={0.1}
+                onValueChange={handleVolumeChange}
+                aria-label="Volume"
+              />
+            </div>
          </div>
       </footer>
     </div>
