@@ -37,7 +37,13 @@ export async function analyzeJoJoConnection(input: AnalyzeJoJoConnectionInput): 
 const analyzeJoJoConnectionPrompt = ai.definePrompt({
   name: 'analyzeJoJoConnectionPrompt',
   tools: [getYouTubeTranscriptTool],
-  input: {schema: AnalyzeJoJoConnectionInputSchema},
+  input: {schema: z.object({
+    type: z.string(),
+    text: z.string().optional(),
+    url: z.string().optional(),
+    image: z.string().optional(),
+    file: z.string().optional(),
+  })},
   output: {schema: AnalyzeJoJoConnectionOutputSchema},
   prompt: `You are a master of the absurd and an encyclopedic expert on JoJo's Bizarre Adventure. Your mission is to unearth the most creative, outlandish, and ridiculously intricate connections between a user's input and the world of JoJo. Do not settle for the obvious; your goal is to weave a web of logic so convoluted it becomes genius.
 
@@ -65,36 +71,32 @@ const analyzeJoJoConnectionFlow = ai.defineFlow(
     outputSchema: AnalyzeJoJoConnectionOutputSchema,
   },
   async input => {
-    let promptInput: AnalyzeJoJoConnectionInput = {...input};
-    let mediaContent: string | undefined;
-    let isImage = false;
+    let finalPromptInput: Record<string, any> = { type: input.type };
 
-    if (input.type === 'url') {
-      try {
-        const imageData = await fetchImageAsDataUri(input.url);
-        mediaContent = imageData;
-        isImage = true;
-        // Re-type the input for the prompt.
-        promptInput = { type: 'image', image: `{{media url=${imageData}}}` };
-      } catch (error) {
-        // Not an image URL, proceed as a regular URL.
-        console.log("URL is not an image, treating as text URL.");
-      }
-    } else if (input.type === 'image') {
-      mediaContent = input.image;
-      isImage = true;
-      promptInput = { type: 'image', image: `{{media url=${input.image}}}` };
-    } else if (input.type === 'file') {
-      mediaContent = input.file;
-      promptInput = { type: 'file', file: `{{media url=${promptInput.file}}}` };
-    }
-    
-    const finalPromptInput = {
-      type: promptInput.type,
-      text: promptInput.type === 'text' ? promptInput.text : undefined,
-      url: promptInput.type === 'url' ? promptInput.url : undefined,
-      image: isImage ? `{{media url=${mediaContent}}}` : undefined,
-      file: promptInput.type === 'file' ? `{{media url=${promptInput.file}}}` : undefined,
+    switch (input.type) {
+      case 'text':
+        finalPromptInput.text = input.text;
+        break;
+      case 'url':
+        try {
+          const imageData = await fetchImageAsDataUri(input.url);
+          // It's an image URL, switch type and use media helper
+          finalPromptInput.type = 'image';
+          finalPromptInput.image = `{{media url=${imageData}}}`;
+        } catch (error) {
+          // Not an image URL, treat as a regular URL for the tool to potentially use.
+          finalPromptInput.url = input.url;
+          console.log("URL is not an image, treating as text URL for tool usage.");
+        }
+        break;
+      case 'image':
+        // Handle uploaded image
+        finalPromptInput.image = `{{media url=${input.image}}}`;
+        break;
+      case 'file':
+        // Handle uploaded file
+        finalPromptInput.file = `{{media url=${input.file}}}`;
+        break;
     }
 
     const {output} = await analyzeJoJoConnectionPrompt(finalPromptInput);
