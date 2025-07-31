@@ -9,11 +9,12 @@
 
 import {ai} from '@/ai/genkit';
 import {getYouTubeTranscriptTool} from '@/ai/tools/youtube';
+import {fetchImageAsDataUri} from '@/services/image-fetcher';
 import {z} from 'genkit';
 
 const AnalyzeJoJoConnectionInputSchema = z.union([
   z.object({type: z.literal('text'), text: z.string().describe('The text to analyze.')}),
-  z.object({type: z.literal('url'), url: z.string().describe('The URL to analyze.')}),
+  z.object({type: z.literal('url'), url: z.string().describe('The URL to analyze. Can be a webpage or a direct link to an image.')}),
   z.object({type: z.literal('image'), image: z.string().describe("The image to analyze, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'.")}),
   z.object({type: z.literal('file'), file: z.string().describe('The file to analyze, as a data URI that must include a MIME type and use Base64 encoding. Expected format: \'data:<mimetype>;base64,<encoded_data>\'.')}),
 ]);
@@ -64,25 +65,39 @@ const analyzeJoJoConnectionFlow = ai.defineFlow(
     outputSchema: AnalyzeJoJoConnectionOutputSchema,
   },
   async input => {
-    let inputText = '';
+    let promptInput: AnalyzeJoJoConnectionInput = {...input};
+    let mediaContent: string | undefined;
+    let isImage = false;
 
-    if (input.type === 'text') {
-      inputText = input.text;
-    } else if (input.type === 'url') {
-      inputText = input.url;
+    if (input.type === 'url') {
+      try {
+        const imageData = await fetchImageAsDataUri(input.url);
+        mediaContent = imageData;
+        isImage = true;
+        // Re-type the input for the prompt.
+        promptInput = { type: 'image', image: `{{media url=${imageData}}}` };
+      } catch (error) {
+        // Not an image URL, proceed as a regular URL.
+        console.log("URL is not an image, treating as text URL.");
+      }
     } else if (input.type === 'image') {
-      inputText = `{{media url=${input.image}}}`;
+      mediaContent = input.image;
+      isImage = true;
+      promptInput = { type: 'image', image: `{{media url=${input.image}}}` };
     } else if (input.type === 'file') {
-      inputText = `{{media url=${input.file}}}`;
+      mediaContent = input.file;
+      promptInput = { type: 'file', file: `{{media url=${input.file}}}` };
+    }
+    
+    const finalPromptInput = {
+      type: promptInput.type,
+      text: promptInput.type === 'text' ? promptInput.text : undefined,
+      url: promptInput.type === 'url' ? promptInput.url : undefined,
+      image: isImage ? `{{media url=${mediaContent}}}` : undefined,
+      file: promptInput.type === 'file' ? `{{media url=${promptInput.file}}}` : undefined,
     }
 
-    const {output} = await analyzeJoJoConnectionPrompt({
-      ...input,
-      text: input.type === 'text' ? inputText : undefined,
-      url: input.type === 'url' ? inputText : undefined,
-      image: input.type === 'image' ? inputText : undefined,
-      file: input.type === 'file' ? inputText : undefined,
-    });
+    const {output} = await analyzeJoJoConnectionPrompt(finalPromptInput);
     return output!;
   }
 );
