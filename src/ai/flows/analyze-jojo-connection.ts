@@ -20,9 +20,14 @@ const AnalyzeJoJoConnectionInputSchema = z.union([
 
 export type AnalyzeJoJoConnectionInput = z.infer<typeof AnalyzeJoJoConnectionInputSchema>;
 
+const ConnectionStepSchema = z.object({
+  explanation: z.string().describe("A step in the connection breakdown, explaining the logical link."),
+  imagePrompt: z.string().describe("A detailed DALL-E 3 style prompt to generate an image that visually represents this step. The style should be vibrant, absurd, and thematically similar to JoJo's Bizarre Adventure. For example: 'A highly-detailed, vibrant anime-style image of the Mona Lisa striking a classic JoJo pose, with menacing Japanese characters floating in the background.'"),
+});
+
 const AnalyzeJoJoConnectionOutputSchema = z.object({
   connectionTitle: z.string().describe('A catchy title for the connection.'),
-  connectionSteps: z.array(z.string()).describe('The step-by-step breakdown of the connection.'),
+  connectionSteps: z.array(ConnectionStepSchema).describe('The step-by-step breakdown of the connection, including an explanation and an image generation prompt for each step.'),
   bizarreOMeter: z.number().int().min(1).max(5).describe('A rating of the connection strength (1-5).'),
   supportingEvidence: z.array(z.string()).optional().describe('Relevant media URLs, quotes, or links.'),
 });
@@ -49,17 +54,12 @@ const analyzeJoJoConnectionPrompt = ai.definePrompt({
 
   If the input is a YouTube URL, use the getYouTubeTranscript tool to fetch the transcript and analyze its content for maximum absurdity.
 
-  Select the most ridiculously compelling connection and explain it step-by-step, as if you are revealing a grand conspiracy. Your explanation should be a journey into madness, culminating in a moment of bizarre revelation.
+  Select the most ridiculously compelling connection and explain it step-by-step. For each step, provide both the textual explanation and a detailed, DALL-E 3 style image prompt to generate a visual for that step. The image prompt should capture the explanation in a vibrant, absurd, and anime-like style that is thematically consistent with JoJo's Bizarre Adventure.
 
   Input: {{{text}}}{{{url}}}{{{file}}}
 
-  Output the connection in the following JSON format:
-  {
-    "connectionTitle": "A catchy, AI-generated title for the connection",
-    "connectionSteps": ["Step 1: ...", "Step 2: ...", ...], // A clear, step-by-step breakdown of the connection.
-    "bizarreOMeter": 3, // A fun rating from 1 to 5, indicating the strength/tenuousness of the connection (1 = Direct Reference, 5 = Absurdly Bizarre Stretch that somehow makes perfect sense).
-    "supportingEvidence": ["URL to manga panel", "Quote from the anime", ...] // (Optional) Relevant media: manga panel, quote, song link, wiki page.
-  }`,
+  Output the connection in the following JSON format.
+  `,
 });
 
 const analyzeJoJoConnectionFlow = ai.defineFlow(

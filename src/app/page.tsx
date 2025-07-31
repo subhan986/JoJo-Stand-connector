@@ -3,7 +3,8 @@
 import { useTransition, useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import type { AnalyzeJoJoConnectionOutput, AnalyzeJoJoConnectionInput } from '@/ai/flows/analyze-jojo-connection';
-import { submitForAnalysis, getJojoImage } from '@/app/actions';
+import { submitForAnalysis, getJojoImage, getSlideshowImages } from '@/app/actions';
+import type { GenerateSlideshowImagesOutput } from '@/ai/flows/generate-slideshow-images';
 import InputForm from '@/components/app/input-form';
 import ResultsDisplay from '@/components/app/results-display';
 import LoadingIndicator from '@/components/app/loading-indicator';
@@ -24,9 +25,11 @@ const tracks = [
   },
 ];
 
-export default function StandConnectorPage() {
+export default function IsThisAReferencePage() {
   const [isPending, startTransition] = useTransition();
-  const [result, setResult] = useState<AnalyzeJoJoConnectionOutput | null>(null);
+  const [analysisResult, setAnalysisResult] = useState<AnalyzeJoJoConnectionOutput | null>(null);
+  const [slideshowImages, setSlideshowImages] = useState<GenerateSlideshowImagesOutput | null>(null);
+  const [isSlideshowLoading, setIsSlideshowLoading] = useState(false);
   const { toast } = useToast();
 
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
@@ -89,7 +92,8 @@ export default function StandConnectorPage() {
 
 
   const handleFormSubmit = async (input: AnalyzeJoJoConnectionInput) => {
-    setResult(null);
+    setAnalysisResult(null);
+    setSlideshowImages(null);
     startTransition(async () => {
       const { data, error } = await submitForAnalysis(input);
       if (error) {
@@ -99,7 +103,22 @@ export default function StandConnectorPage() {
           description: error,
         });
       } else {
-        setResult(data);
+        setAnalysisResult(data);
+        if (data) {
+          setIsSlideshowLoading(true);
+          const imagePrompts = data.connectionSteps.map(step => step.imagePrompt);
+          const slideshowResult = await getSlideshowImages({ prompts: imagePrompts });
+          if (slideshowResult.error) {
+             toast({
+                variant: 'destructive',
+                title: 'Slideshow Failed',
+                description: "Couldn't generate images for the slideshow.",
+             });
+          } else {
+            setSlideshowImages(slideshowResult.data);
+          }
+          setIsSlideshowLoading(false);
+        }
       }
     });
   };
@@ -138,12 +157,16 @@ export default function StandConnectorPage() {
 
           <div className="mt-8">
             {isPending && <LoadingIndicator />}
-            {result && (
+            {analysisResult && (
               <div className="animate-in fade-in duration-500">
-                <ResultsDisplay result={result} />
+                <ResultsDisplay 
+                  result={analysisResult} 
+                  slideshowImages={slideshowImages}
+                  isSlideshowLoading={isSlideshowLoading}
+                />
               </div>
             )}
-            {!isPending && !result && (
+            {!isPending && !analysisResult && (
               <div className="text-center text-muted-foreground p-8 border border-dashed border-border/50 bg-card/50 backdrop-blur-sm rounded-lg">
                 <Sparkles className="mx-auto h-12 w-12 text-primary" />
                 <p className="mt-4 text-lg">Your bizarre analysis will appear here.</p>

@@ -1,13 +1,16 @@
 'use client';
 
-import { Check, Copy, ExternalLink, GitCommitVertical } from 'lucide-react';
+import { Check, Copy, ExternalLink, BookText, Images } from 'lucide-react';
 import type { AnalyzeJoJoConnectionOutput } from '@/ai/flows/analyze-jojo-connection';
+import type { GenerateSlideshowImagesOutput } from '@/ai/flows/generate-slideshow-images';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import BizarreOMeter from './bizarre-o-meter';
 import { Button } from '../ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import ResultsSlideshow from './results-slideshow';
 
 
 const MenacingSymbol = ({ className }: { className?: string }) => (
@@ -24,9 +27,11 @@ const MenacingSymbol = ({ className }: { className?: string }) => (
 
 interface ResultsDisplayProps {
   result: AnalyzeJoJoConnectionOutput;
+  slideshowImages: GenerateSlideshowImagesOutput | null;
+  isSlideshowLoading: boolean;
 }
 
-export default function ResultsDisplay({ result }: ResultsDisplayProps) {
+export default function ResultsDisplay({ result, slideshowImages, isSlideshowLoading }: ResultsDisplayProps) {
     const { toast } = useToast();
     const [isCopied, setIsCopied] = useState(false);
 
@@ -34,7 +39,7 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
         let text = `*${result.connectionTitle}*\n\n`;
         text += "The Path of Fate:\n";
         result.connectionSteps.forEach((step, index) => {
-            text += `${index + 1}. ${step}\n`;
+            text += `${index + 1}. ${step.explanation}\n`;
         });
         text += `\nBizarre-o-Meter: ${result.bizarreOMeter}/5\n`;
         if (result.supportingEvidence && result.supportingEvidence.length > 0) {
@@ -73,27 +78,42 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
         <CardDescription>This must be the work of an enemy Stand!</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div>
-          <h3 className="font-semibold text-lg mb-4 font-headline uppercase tracking-wider">The Path of Fate:</h3>
-          <div className="relative pl-6">
-              {result.connectionSteps.map((step, index) => (
-                <div key={index} className="relative pb-8">
-                  {/* Vertical line */}
-                  {index < result.connectionSteps.length - 1 && (
-                      <div className="absolute top-2 left-[10px] w-px h-full bg-border" />
-                  )}
-                  {/* Node icon */}
-                  <div className="absolute top-[-4px] left-[-2px] h-4 w-4 bg-transparent rounded-full flex items-center justify-center">
-                    <MenacingSymbol />
-                  </div>
-                  {/* Content */}
-                  <div className="pl-6">
-                      <p className="flex-1 text-muted-foreground">{step}</p>
+        <Tabs defaultValue="text" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="text"><BookText className="w-4 h-4 mr-2"/>Text Analysis</TabsTrigger>
+                <TabsTrigger value="slideshow" disabled={isSlideshowLoading}><Images className="w-4 h-4 mr-2"/>Visual Journey</TabsTrigger>
+            </TabsList>
+            <TabsContent value="text" className="mt-4">
+                <div>
+                  <h3 className="font-semibold text-lg mb-4 font-headline uppercase tracking-wider">The Path of Fate:</h3>
+                  <div className="relative pl-6">
+                      {result.connectionSteps.map((step, index) => (
+                        <div key={index} className="relative pb-8">
+                          {/* Vertical line */}
+                          {index < result.connectionSteps.length - 1 && (
+                              <div className="absolute top-2 left-[10px] w-px h-full bg-border" />
+                          )}
+                          {/* Node icon */}
+                          <div className="absolute top-[-4px] left-[-2px] h-4 w-4 bg-transparent rounded-full flex items-center justify-center">
+                            <MenacingSymbol />
+                          </div>
+                          {/* Content */}
+                          <div className="pl-6">
+                              <p className="flex-1 text-muted-foreground">{step.explanation}</p>
+                          </div>
+                        </div>
+                      ))}
                   </div>
                 </div>
-              ))}
-          </div>
-        </div>
+            </TabsContent>
+            <TabsContent value="slideshow" className="mt-4">
+                <ResultsSlideshow
+                    steps={result.connectionSteps}
+                    images={slideshowImages}
+                    isLoading={isSlideshowLoading}
+                />
+            </TabsContent>
+        </Tabs>
         
         <BizarreOMeter rating={result.bizarreOMeter} />
 
