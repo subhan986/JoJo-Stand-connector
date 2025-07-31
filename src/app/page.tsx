@@ -44,7 +44,7 @@ export default function StandConnectorPage() {
         toast({
           variant: 'destructive',
           title: 'Audio Error',
-          description: 'Could not play the music file.',
+          description: 'Could not play the music file. Is it named correctly in the /public folder?',
         });
       });
     }
