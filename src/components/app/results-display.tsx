@@ -7,6 +7,20 @@ import BizarreOMeter from './bizarre-o-meter';
 import { Button } from '../ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
+import { cn } from '@/lib/utils';
+
+
+const MenacingSymbol = ({ className }: { className?: string }) => (
+    <span
+      className={cn(
+        'font-headline text-2xl font-bold text-primary transition-all duration-300',
+        className
+      )}
+      style={{ textShadow: '1px 1px 0px hsl(var(--accent))' }}
+    >
+      ゴ
+    </span>
+  );
 
 interface ResultsDisplayProps {
   result: AnalyzeJoJoConnectionOutput;
@@ -53,24 +67,24 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
     };
 
   return (
-    <Card className="bg-card/50 backdrop-blur-sm border-accent/50 border-2 shadow-lg shadow-accent/10">
+    <Card className="bg-card/70 backdrop-blur-sm border-accent/50 border-2 shadow-lg shadow-accent/20">
       <CardHeader>
-        <CardTitle className="font-headline text-3xl text-accent">{result.connectionTitle}</CardTitle>
+        <CardTitle className="font-headline text-3xl text-accent font-black uppercase tracking-wider">{result.connectionTitle}</CardTitle>
         <CardDescription>This must be the work of an enemy Stand!</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div>
-          <h3 className="font-semibold text-lg mb-4">The Path of Fate:</h3>
+          <h3 className="font-semibold text-lg mb-4 font-headline uppercase tracking-wider">The Path of Fate:</h3>
           <div className="relative pl-6">
               {result.connectionSteps.map((step, index) => (
                 <div key={index} className="relative pb-8">
                   {/* Vertical line */}
                   {index < result.connectionSteps.length - 1 && (
-                      <div className="absolute top-2 left-[3px] w-px h-full bg-border" />
+                      <div className="absolute top-2 left-[10px] w-px h-full bg-border" />
                   )}
                   {/* Node icon */}
-                  <div className="absolute top-0 left-[-8px] h-4 w-4 bg-accent rounded-full flex items-center justify-center ring-4 ring-background">
-                    <GitCommitVertical className="w-3 h-3 text-accent-foreground" />
+                  <div className="absolute top-[-4px] left-[-2px] h-4 w-4 bg-transparent rounded-full flex items-center justify-center">
+                    <MenacingSymbol />
                   </div>
                   {/* Content */}
                   <div className="pl-6">
@@ -85,7 +99,7 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
 
         {result.supportingEvidence && result.supportingEvidence.length > 0 && (
           <div>
-            <h3 className="font-semibold text-lg mb-2">Supporting Evidence:</h3>
+            <h3 className="font-semibold text-lg mb-2 font-headline uppercase tracking-wider">Supporting Evidence:</h3>
             <ul className="space-y-2">
                 {result.supportingEvidence.map((evidence, index) => (
                     <li key={index} className="text-muted-foreground">
@@ -105,7 +119,7 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
         )}
       </CardContent>
       <CardFooter>
-        <Button onClick={handleShare} className="w-full bg-accent hover:bg-accent/90 text-accent-foreground">
+        <Button onClick={handleShare} className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-bold uppercase tracking-wider">
             {isCopied ? <Check className="mr-2 h-4 w-4" /> : <Copy className="mr-2 h-4 w-4" />}
             {isCopied ? 'Copied!' : '"To Be Continued..." (Share Result)'}
         </Button>

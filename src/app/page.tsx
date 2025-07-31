@@ -44,7 +44,6 @@ export default function StandConnectorPage() {
         setJojoImage(imageUrl);
       } catch (error) {
         console.error("Failed to generate JoJo image:", error);
-        // Fallback to a placeholder if generation fails
         setJojoImage("https://placehold.co/100x100.png");
       } finally {
         setIsImageLoading(false);
@@ -55,23 +54,38 @@ export default function StandConnectorPage() {
 
 
   useEffect(() => {
-    if (audioRef.current) {
-        audioRef.current.src = tracks[currentTrackIndex].src;
-        if (isPlaying) {
-            audioRef.current.play().catch(error => {
-                console.error("Autoplay prevented:", error);
-                // If autoplay fails, set isPlaying to false so the UI icon is correct
-                setIsPlaying(false);
-            });
-        }
+    const audio = audioRef.current;
+    if (audio) {
+      audio.src = tracks[currentTrackIndex].src;
+      if (isPlaying) {
+        audio.play().catch(error => {
+          console.error("Autoplay was prevented by the browser.");
+          setIsPlaying(false);
+        });
+      }
     }
   }, [currentTrackIndex]);
 
   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume;
+    const audio = audioRef.current;
+    if (audio) {
+      audio.volume = volume;
     }
   }, [volume]);
+  
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+  
+    if (isPlaying) {
+      audio.play().catch(error => {
+        console.error("Autoplay was prevented by the browser.");
+        setIsPlaying(false);
+      });
+    } else {
+      audio.pause();
+    }
+  }, [isPlaying]);
 
 
   const handleFormSubmit = async (input: AnalyzeJoJoConnectionInput) => {
@@ -91,15 +105,7 @@ export default function StandConnectorPage() {
   };
 
   const toggleMusic = () => {
-    if (!audioRef.current) return;
-    
-    const newIsPlaying = !isPlaying;
-    if (newIsPlaying) {
-        audioRef.current.play().catch(error => console.error("Error playing audio:", error));
-    } else {
-        audioRef.current.pause();
-    }
-    setIsPlaying(newIsPlaying);
+    setIsPlaying(prev => !prev);
   };
   
   const playNextTrack = () => {
@@ -116,7 +122,11 @@ export default function StandConnectorPage() {
       <main className="flex-grow container mx-auto px-4 py-8 md:py-12">
         <div className="max-w-3xl mx-auto">
           <header className="text-center mb-8">
-            <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tight bg-gradient-to-r from-primary via-accent to-primary/80 text-transparent bg-clip-text">
+            <h1 className="font-headline text-4xl md:text-6xl font-black tracking-tighter uppercase bg-gradient-to-r from-primary via-accent to-primary/80 text-transparent bg-clip-text"
+              style={{
+                textShadow: '0 0 10px hsl(var(--primary) / 0.5), 0 0 20px hsl(var(--accent) / 0.5)'
+              }}
+            >
               Stand Connector
             </h1>
             <p className="text-muted-foreground mt-2 text-lg">
@@ -134,7 +144,7 @@ export default function StandConnectorPage() {
               </div>
             )}
             {!isPending && !result && (
-              <div className="text-center text-muted-foreground p-8 border border-border/50 bg-card/50 backdrop-blur-sm rounded-lg">
+              <div className="text-center text-muted-foreground p-8 border border-dashed border-border/50 bg-card/50 backdrop-blur-sm rounded-lg">
                 <Sparkles className="mx-auto h-12 w-12 text-primary" />
                 <p className="mt-4 text-lg">Your bizarre analysis will appear here.</p>
                 <p className="text-sm">Enter something above and unleash your Stand!</p>
