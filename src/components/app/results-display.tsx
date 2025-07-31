@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, Copy, ExternalLink } from 'lucide-react';
+import { Check, Copy, ExternalLink, GitCommitVertical } from 'lucide-react';
 import type { AnalyzeJoJoConnectionOutput } from '@/ai/flows/analyze-jojo-connection';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import BizarreOMeter from './bizarre-o-meter';
@@ -60,15 +60,25 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
       </CardHeader>
       <CardContent className="space-y-6">
         <div>
-          <h3 className="font-semibold text-lg mb-2">The Path of Fate:</h3>
-          <ul className="space-y-3 list-inside">
-            {result.connectionSteps.map((step, index) => (
-              <li key={index} className="flex items-start">
-                <span className="text-accent font-bold mr-3">{index + 1}.</span>
-                <p className="flex-1 text-muted-foreground">{step}</p>
-              </li>
-            ))}
-          </ul>
+          <h3 className="font-semibold text-lg mb-4">The Path of Fate:</h3>
+          <div className="relative pl-6">
+              {result.connectionSteps.map((step, index) => (
+                <div key={index} className="relative pb-8">
+                  {/* Vertical line */}
+                  {index < result.connectionSteps.length - 1 && (
+                      <div className="absolute top-2 left-[3px] w-px h-full bg-border" />
+                  )}
+                  {/* Node icon */}
+                  <div className="absolute top-0 left-[-8px] h-4 w-4 bg-accent rounded-full flex items-center justify-center ring-4 ring-background">
+                    <GitCommitVertical className="w-3 h-3 text-accent-foreground" />
+                  </div>
+                  {/* Content */}
+                  <div className="pl-6">
+                      <p className="flex-1 text-muted-foreground">{step}</p>
+                  </div>
+                </div>
+              ))}
+          </div>
         </div>
         
         <BizarreOMeter rating={result.bizarreOMeter} />
