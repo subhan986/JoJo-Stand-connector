@@ -34,22 +34,21 @@ export default function StandConnectorPage() {
   };
 
   const toggleMusic = () => {
-    // Check if audio is loaded and ready
-    if (audioRef.current && audioRef.current.src) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play().catch(error => {
-          console.error("Error playing audio:", error);
-          toast({
-            variant: 'destructive',
-            title: 'Audio Error',
-            description: 'Could not play the music file.',
-          });
+    if (!audioRef.current) return;
+
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play().catch(error => {
+        console.error("Error playing audio:", error);
+        toast({
+          variant: 'destructive',
+          title: 'Audio Error',
+          description: 'Could not play the music file.',
         });
-      }
-      setIsPlaying(!isPlaying);
+      });
     }
+    setIsPlaying(!isPlaying);
   };
 
   return (
