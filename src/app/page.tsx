@@ -122,15 +122,15 @@ export default function StandConnectorPage() {
       <main className="flex-grow container mx-auto px-4 py-8 md:py-12">
         <div className="max-w-3xl mx-auto">
           <header className="text-center mb-8">
-            <h1 className="font-headline text-4xl md:text-6xl font-black tracking-tighter uppercase bg-gradient-to-r from-primary via-accent to-primary/80 text-transparent bg-clip-text"
+            <h1 className="font-headline text-4xl md:text-5xl font-black tracking-tighter bg-gradient-to-r from-primary via-accent to-primary/80 text-transparent bg-clip-text"
               style={{
                 textShadow: '0 0 10px hsl(var(--primary) / 0.5), 0 0 20px hsl(var(--accent) / 0.5)'
               }}
             >
-              Stand Connector
+              Is this a JoJo Reference?
             </h1>
             <p className="text-muted-foreground mt-2 text-lg">
-              Is that a JoJo Reference? Uncover the bizarre connections in anything.
+              Uncover the bizarre connections in anything.
             </p>
           </header>
 
