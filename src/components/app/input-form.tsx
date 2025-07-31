@@ -73,7 +73,7 @@ export default function InputForm({ onSubmit, isLoading }: InputFormProps) {
   };
 
   return (
-    <Card className="bg-card/50 backdrop-blur-sm">
+    <Card className="bg-card/50 backdrop-blur-sm border-border/50">
       <CardHeader>
         <CardTitle>Awaken Your Stand</CardTitle>
         <CardDescription>Present any concept, and I shall reveal its connection to the Joestar lineage.</CardDescription>
