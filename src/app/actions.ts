@@ -1,6 +1,7 @@
 'use server';
 
 import { analyzeJoJoConnection, AnalyzeJoJoConnectionInput, AnalyzeJoJoConnectionOutput } from "@/ai/flows/analyze-jojo-connection";
+import { generateJoJoImage, GenerateJoJoImageOutput } from "@/ai/flows/generate-jojo-image";
 
 interface AnalysisResult {
     data: AnalyzeJoJoConnectionOutput | null;
@@ -16,4 +17,8 @@ export async function submitForAnalysis(input: AnalyzeJoJoConnectionInput): Prom
     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
     return { data: null, error: `An unexpected error occurred during analysis. WRYYYYY! Details: ${errorMessage}` };
   }
+}
+
+export async function getJojoImage(): Promise<GenerateJoJoImageOutput> {
+    return generateJoJoImage();
 }

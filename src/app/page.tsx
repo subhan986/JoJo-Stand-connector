@@ -3,14 +3,16 @@
 import { useTransition, useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import type { AnalyzeJoJoConnectionOutput, AnalyzeJoJoConnectionInput } from '@/ai/flows/analyze-jojo-connection';
-import { submitForAnalysis } from '@/app/actions';
+import { submitForAnalysis, getJojoImage } from '@/app/actions';
 import InputForm from '@/components/app/input-form';
 import ResultsDisplay from '@/components/app/results-display';
 import LoadingIndicator from '@/components/app/loading-indicator';
 import { useToast } from '@/hooks/use-toast';
-import { Sparkles, Music, VolumeX, SkipForward, Volume2 } from 'lucide-react';
+import { Sparkles, Music, VolumeX, SkipForward, Volume2, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
+import { Skeleton } from '@/components/ui/skeleton';
+
 
 const tracks = [
   {
@@ -32,6 +34,26 @@ export default function StandConnectorPage() {
   const [isPlaying, setIsPlaying] = useState(true); // Autoplay by default
   const [volume, setVolume] = useState(1);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [jojoImage, setJojoImage] = useState<string | null>(null);
+  const [isImageLoading, setIsImageLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchImage = async () => {
+      try {
+        setIsImageLoading(true);
+        const { imageUrl } = await getJojoImage();
+        setJojoImage(imageUrl);
+      } catch (error) {
+        console.error("Failed to generate JoJo image:", error);
+        // Fallback to a placeholder if generation fails
+        setJojoImage("https://placehold.co/100x100.png");
+      } finally {
+        setIsImageLoading(false);
+      }
+    };
+    fetchImage();
+  }, []);
+
 
   useEffect(() => {
     if (audioRef.current) {
@@ -124,14 +146,22 @@ export default function StandConnectorPage() {
       </main>
       <footer className="text-center py-4 text-sm text-muted-foreground relative">
         <div className="absolute bottom-2 left-4 h-24 w-24">
-            <Image 
-                src="https://placehold.co/100x100.png" 
-                alt="Dancing Jotaro" 
-                width={100}
-                height={100}
-                className="animate-float"
-                data-ai-hint="Jotaro Kujo dancing"
-            />
+            {isImageLoading ? (
+                 <div className="w-[100px] h-[100px] flex flex-col items-center justify-center bg-card/50 rounded-lg">
+                    <ImageIcon className="w-8 h-8 text-primary animate-pulse" />
+                    <p className="text-xs mt-2 text-muted-foreground">Summoning...</p>
+                 </div>
+            ) : (
+                jojoImage && (
+                    <Image 
+                        src={jojoImage} 
+                        alt="AI-generated JoJo Character" 
+                        width={100}
+                        height={100}
+                        className="animate-float object-contain"
+                    />
+                )
+            )}
         </div>
         <p>Powered by the inexplicable energy of Hamon and Google Gemini.</p>
          <div className="absolute bottom-2 right-4 flex items-center gap-4">
