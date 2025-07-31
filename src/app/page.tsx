@@ -1,6 +1,6 @@
 'use client';
 
-import { useTransition, useState } from 'react';
+import { useTransition, useState, useRef, useEffect } from 'react';
 import type { AnalyzeJoJoConnectionOutput, AnalyzeJoJoConnectionInput } from '@/ai/flows/analyze-jojo-connection';
 import { submitForAnalysis } from '@/app/actions';
 import InputForm from '@/components/app/input-form';
@@ -14,7 +14,21 @@ export default function StandConnectorPage() {
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<AnalyzeJoJoConnectionOutput | null>(null);
   const { toast } = useToast();
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  useEffect(() => {
+    // Attempt to play music when component mounts, but respect browser autoplay policies.
+    // User interaction is often required.
+    if (audioRef.current) {
+        audioRef.current.play().then(() => {
+            setIsPlaying(true);
+        }).catch(error => {
+            console.log("Autoplay blocked by browser:", error);
+            setIsPlaying(false);
+        });
+    }
+  }, []);
 
   const handleFormSubmit = async (input: AnalyzeJoJoConnectionInput) => {
     setResult(null);
@@ -31,22 +45,21 @@ export default function StandConnectorPage() {
       }
     });
   };
-  
-  const videoId = '5kK342lCgac'; // A lofi version of Jotaro's theme
+
+  const toggleMusic = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground font-body">
-      <div style={{ position: 'fixed', top: '-1000px', left: '-1000px' }}>
-          <iframe
-              width="1"
-              height="1"
-              src={`https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}&controls=0&mute=${isPlaying ? 0 : 1}`}
-              title="YouTube video player"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-          ></iframe>
-      </div>
+      <audio ref={audioRef} src="/jotaro-lofi.mp3" loop />
       <main className="flex-grow container mx-auto px-4 py-8 md:py-12">
         <div className="max-w-3xl mx-auto">
           <header className="text-center mb-8">
@@ -79,11 +92,11 @@ export default function StandConnectorPage() {
       </main>
       <footer className="text-center py-4 text-sm text-muted-foreground relative">
         <p>Powered by the inexplicable energy of Hamon and Google Gemini.</p>
-         <Button 
-            variant="ghost" 
-            size="icon" 
+         <Button
+            variant="ghost"
+            size="icon"
             className="absolute bottom-2 right-4"
-            onClick={() => setIsPlaying(!isPlaying)}
+            onClick={toggleMusic}
             aria-label={isPlaying ? 'Mute music' : 'Unmute music'}
           >
             {isPlaying ? <Music className="h-5 w-5 text-accent" /> : <VolumeX className="h-5 w-5 text-muted-foreground" />}
