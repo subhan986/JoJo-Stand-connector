@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertCircle, File, Image as ImageIcon, Link, Loader2, Text } from 'lucide-react';
+import { AlertCircle, File, Link, Loader2, Text } from 'lucide-react';
 import type { AnalyzeJoJoConnectionInput } from '@/ai/flows/analyze-jojo-connection';
 
 interface InputFormProps {
@@ -54,11 +54,6 @@ export default function InputForm({ onSubmit, isLoading }: InputFormProps) {
             if (!url) return;
             input = { type: 'url', url };
             break;
-        case 'image':
-            if (!file) return;
-            const imageBase64 = await toBase64(file);
-            input = { type: 'image', image: imageBase64 };
-            break;
         case 'file':
             if (!file) return;
             const fileBase64 = await toBase64(file);
@@ -85,10 +80,9 @@ export default function InputForm({ onSubmit, isLoading }: InputFormProps) {
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="text" className="w-full" onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="text"><Text className="w-4 h-4 mr-2"/>Text</TabsTrigger>
             <TabsTrigger value="url"><Link className="w-4 h-4 mr-2"/>URL</TabsTrigger>
-            <TabsTrigger value="image"><ImageIcon className="w-4 h-4 mr-2"/>Image</TabsTrigger>
             <TabsTrigger value="file"><File className="w-4 h-4 mr-2"/>File</TabsTrigger>
           </TabsList>
           <form onSubmit={handleSubmit} className="mt-4">
@@ -112,22 +106,12 @@ export default function InputForm({ onSubmit, isLoading }: InputFormProps) {
                     className="font-code"
                 />
             </TabsContent>
-            <TabsContent value="image">
-                <Label htmlFor="image-upload" className="sr-only">Upload Image</Label>
-                <Input
-                    id="image-upload"
-                    type="file"
-                    accept="image/png, image/jpeg, image/gif"
-                    onChange={handleFileChange}
-                    disabled={isLoading}
-                />
-            </TabsContent>
             <TabsContent value="file">
                 <Label htmlFor="file-upload" className="sr-only">Upload File</Label>
                 <Input
                     id="file-upload"
                     type="file"
-                    accept=".pdf,.txt,.docx"
+                    accept=".pdf,.txt,.docx,.png, .jpeg, .jpg, .gif"
                     onChange={handleFileChange}
                     disabled={isLoading}
                 />

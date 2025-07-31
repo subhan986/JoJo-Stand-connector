@@ -15,7 +15,6 @@ import {z} from 'genkit';
 const AnalyzeJoJoConnectionInputSchema = z.union([
   z.object({type: z.literal('text'), text: z.string().describe('The text to analyze.')}),
   z.object({type: z.literal('url'), url: z.string().describe('The URL to analyze. Can be a webpage or a direct link to an image.')}),
-  z.object({type: z.literal('image'), image: z.string().describe("The image to analyze, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'.")}),
   z.object({type: z.literal('file'), file: z.string().describe('The file to analyze, as a data URI that must include a MIME type and use Base64 encoding. Expected format: \'data:<mimetype>;base64,<encoded_data>\'.')}),
 ]);
 
@@ -41,7 +40,6 @@ const analyzeJoJoConnectionPrompt = ai.definePrompt({
     type: z.string(),
     text: z.string().optional(),
     url: z.string().optional(),
-    image: z.string().optional(),
     file: z.string().optional(),
   })},
   output: {schema: AnalyzeJoJoConnectionOutputSchema},
@@ -53,7 +51,7 @@ const analyzeJoJoConnectionPrompt = ai.definePrompt({
 
   Select the most ridiculously compelling connection and explain it step-by-step, as if you are revealing a grand conspiracy. Your explanation should be a journey into madness, culminating in a moment of bizarre revelation.
 
-  Input: {{{text}}}{{{url}}}{{{image}}}{{{file}}}
+  Input: {{{text}}}{{{url}}}{{{file}}}
 
   Output the connection in the following JSON format:
   {
@@ -82,16 +80,12 @@ const analyzeJoJoConnectionFlow = ai.defineFlow(
           const imageData = await fetchImageAsDataUri(input.url);
           // It's an image URL, switch type and use media helper
           finalPromptInput.type = 'image';
-          finalPromptInput.image = `{{media url=${imageData}}}`;
+          finalPromptInput.file = `{{media url=${imageData}}}`;
         } catch (error) {
           // Not an image URL, treat as a regular URL for the tool to potentially use.
           finalPromptInput.url = input.url;
           console.log("URL is not an image, treating as text URL for tool usage.");
         }
-        break;
-      case 'image':
-        // Handle uploaded image
-        finalPromptInput.image = `{{media url=${input.image}}}`;
         break;
       case 'file':
         // Handle uploaded file
