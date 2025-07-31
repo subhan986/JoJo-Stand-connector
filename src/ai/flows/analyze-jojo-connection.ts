@@ -39,13 +39,13 @@ const analyzeJoJoConnectionPrompt = ai.definePrompt({
   tools: [getYouTubeTranscriptTool],
   input: {schema: AnalyzeJoJoConnectionInputSchema},
   output: {schema: AnalyzeJoJoConnectionOutputSchema},
-  prompt: `You are an expert on JoJo's Bizarre Adventure. Your task is to find creative and compelling connections between a user's input and the world of JoJo's Bizarre Adventure.
+  prompt: `You are a master of the absurd and an encyclopedic expert on JoJo's Bizarre Adventure. Your mission is to unearth the most creative, outlandish, and ridiculously intricate connections between a user's input and the world of JoJo. Do not settle for the obvious; your goal is to weave a web of logic so convoluted it becomes genius.
 
-  The user will provide an input of type {{{type}}}. Based on this input, identify key subjects, concepts, entities, and themes. Then, brainstorm direct and indirect connections to the JJBA universe (manga, anime, characters, Stands, plot points, author inspirations, music references, etc.).
+  The user will provide an input of type {{{type}}}. Deconstruct this input into its most obscure components—concepts, aesthetics, historical footnotes, anything is fair game. Then, brainstorm the most unexpected links to the JJBA universe (manga, anime, characters, Stands, plot points, author inspirations, music references, esoteric trivia, etc.).
 
-  If the input is a YouTube URL, use the getYouTubeTranscript tool to fetch the transcript and analyze its content.
+  If the input is a YouTube URL, use the getYouTubeTranscript tool to fetch the transcript and analyze its content for maximum absurdity.
 
-  Select the most compelling connection and explain it step-by-step, as if telling a fascinating story. Structure the explanation with a title, a short summary, and a detailed path of connection. Cite specific examples from JJBA.
+  Select the most ridiculously compelling connection and explain it step-by-step, as if you are revealing a grand conspiracy. Your explanation should be a journey into madness, culminating in a moment of bizarre revelation.
 
   Input: {{{text}}}{{{url}}}{{{image}}}{{{file}}}
 
@@ -53,7 +53,7 @@ const analyzeJoJoConnectionPrompt = ai.definePrompt({
   {
     "connectionTitle": "A catchy, AI-generated title for the connection",
     "connectionSteps": ["Step 1: ...", "Step 2: ...", ...], // A clear, step-by-step breakdown of the connection.
-    "bizarreOMeter": 3, // A fun rating from 1 to 5, indicating the strength/tenuousness of the connection (1 = Direct Reference, 5 = Absurdly Bizarre Stretch).
+    "bizarreOMeter": 3, // A fun rating from 1 to 5, indicating the strength/tenuousness of the connection (1 = Direct Reference, 5 = Absurdly Bizarre Stretch that somehow makes perfect sense).
     "supportingEvidence": ["URL to manga panel", "Quote from the anime", ...] // (Optional) Relevant media: manga panel, quote, song link, wiki page.
   }`,
 });
@@ -86,7 +86,7 @@ const analyzeJoJoConnectionFlow = ai.defineFlow(
       promptInput = { type: 'image', image: `{{media url=${input.image}}}` };
     } else if (input.type === 'file') {
       mediaContent = input.file;
-      promptInput = { type: 'file', file: `{{media url=${input.file}}}` };
+      promptInput = { type: 'file', file: `{{media url=${promptInput.file}}}` };
     }
     
     const finalPromptInput = {
