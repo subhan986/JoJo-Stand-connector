@@ -11,7 +11,6 @@ import { useToast } from '@/hooks/use-toast';
 import { Sparkles, Music, VolumeX, SkipForward, Volume2, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Skeleton } from '@/components/ui/skeleton';
 
 
 const tracks = [
@@ -135,7 +134,7 @@ export default function StandConnectorPage() {
               </div>
             )}
             {!isPending && !result && (
-              <div className="text-center text-muted-foreground p-8 border-2 border-dashed border-border rounded-lg">
+              <div className="text-center text-muted-foreground p-8 border border-border/50 bg-card/50 backdrop-blur-sm rounded-lg">
                 <Sparkles className="mx-auto h-12 w-12 text-primary" />
                 <p className="mt-4 text-lg">Your bizarre analysis will appear here.</p>
                 <p className="text-sm">Enter something above and unleash your Stand!</p>
@@ -147,7 +146,7 @@ export default function StandConnectorPage() {
       <footer className="text-center py-4 text-sm text-muted-foreground relative">
         <div className="absolute bottom-2 left-4 h-24 w-24">
             {isImageLoading ? (
-                 <div className="w-[100px] h-[100px] flex flex-col items-center justify-center bg-card/50 rounded-lg">
+                 <div className="w-[100px] h-[100px] flex flex-col items-center justify-center bg-card/50 backdrop-blur-sm border border-border/50 rounded-lg">
                     <ImageIcon className="w-8 h-8 text-primary animate-pulse" />
                     <p className="text-xs mt-2 text-muted-foreground">Summoning...</p>
                  </div>

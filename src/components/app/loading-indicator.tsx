@@ -23,7 +23,7 @@ const MenacingSymbol = ({
 
 export default function LoadingIndicator() {
   return (
-    <div className="flex flex-col items-center justify-center p-8 text-center bg-card/50 rounded-lg">
+    <div className="flex flex-col items-center justify-center p-8 text-center bg-card/50 backdrop-blur-sm border border-border/50 rounded-lg">
       <div className="flex space-x-2">
         <MenacingSymbol className="animate-[fade-in-out_2s_ease-in-out_infinite]" />
         <MenacingSymbol className="animate-[fade-in-out_2s_ease-in-out_0.25s_infinite]" />

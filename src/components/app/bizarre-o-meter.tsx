@@ -29,7 +29,7 @@ const BizarreOMeter: FC<BizarreOMeterProps> = ({ rating }) => {
   };
 
   return (
-    <div className="flex flex-col items-center gap-2 my-4 p-4 bg-card/50 rounded-lg">
+    <div className="flex flex-col items-center gap-2 my-4 p-4 bg-card/50 backdrop-blur-sm border border-border/50 rounded-lg">
        <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Bizarre-O-Meter</h3>
       <div className="flex items-end space-x-1">
         {Array.from({ length: 5 }).map((_, index) => (

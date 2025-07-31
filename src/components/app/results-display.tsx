@@ -53,7 +53,7 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
     };
 
   return (
-    <Card className="border-accent border-2 shadow-lg shadow-accent/10">
+    <Card className="bg-card/50 backdrop-blur-sm border-accent/50 border-2 shadow-lg shadow-accent/10">
       <CardHeader>
         <CardTitle className="font-headline text-3xl text-accent">{result.connectionTitle}</CardTitle>
         <CardDescription>This must be the work of an enemy Stand!</CardDescription>
