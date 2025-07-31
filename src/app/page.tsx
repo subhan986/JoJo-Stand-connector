@@ -1,21 +1,48 @@
 'use client';
 
-import { useTransition, useState, useRef } from 'react';
+import { useTransition, useState, useRef, useEffect } from 'react';
 import type { AnalyzeJoJoConnectionOutput, AnalyzeJoJoConnectionInput } from '@/ai/flows/analyze-jojo-connection';
 import { submitForAnalysis } from '@/app/actions';
 import InputForm from '@/components/app/input-form';
 import ResultsDisplay from '@/components/app/results-display';
 import LoadingIndicator from '@/components/app/loading-indicator';
 import { useToast } from '@/hooks/use-toast';
-import { Sparkles, Music, VolumeX } from 'lucide-react';
+import { Sparkles, Music, VolumeX, SkipForward } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+
+const tracks = [
+  {
+    name: "Jotaro's Theme",
+    src: "/Jotaro Theme but it's FUNKY LOFI HIP HOP (Chill Beats to Yare Yare Daze To) [6SxmlFORXmI].mp3",
+  },
+  {
+    name: "Giorno's Theme",
+    src: "/Giorno's Theme but it's SMOOTH LOFI HIP HOP (Chill Beats to Have a Dream to) [MBiXbkKVL2E].mp3",
+  },
+];
 
 export default function StandConnectorPage() {
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<AnalyzeJoJoConnectionOutput | null>(null);
   const { toast } = useToast();
-  const [isPlaying, setIsPlaying] = useState(false);
+
+  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(true); // Autoplay by default
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    if (audioRef.current) {
+        audioRef.current.src = tracks[currentTrackIndex].src;
+        if (isPlaying) {
+            audioRef.current.play().catch(error => {
+                console.error("Autoplay prevented:", error);
+                // If autoplay fails, set isPlaying to false so the UI icon is correct
+                setIsPlaying(false);
+            });
+        }
+    }
+  }, [currentTrackIndex]);
+
 
   const handleFormSubmit = async (input: AnalyzeJoJoConnectionInput) => {
     setResult(null);
@@ -35,25 +62,23 @@ export default function StandConnectorPage() {
 
   const toggleMusic = () => {
     if (!audioRef.current) return;
-
-    if (isPlaying) {
-      audioRef.current.pause();
+    
+    const newIsPlaying = !isPlaying;
+    if (newIsPlaying) {
+        audioRef.current.play().catch(error => console.error("Error playing audio:", error));
     } else {
-      audioRef.current.play().catch(error => {
-        console.error("Error playing audio:", error);
-        toast({
-          variant: 'destructive',
-          title: 'Audio Error',
-          description: 'Could not play the music file. Is it named correctly in the /public folder?',
-        });
-      });
+        audioRef.current.pause();
     }
-    setIsPlaying(!isPlaying);
+    setIsPlaying(newIsPlaying);
+  };
+  
+  const playNextTrack = () => {
+    setCurrentTrackIndex((prevIndex) => (prevIndex + 1) % tracks.length);
   };
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground font-body">
-      <audio ref={audioRef} src="/Jotaro Theme but it's FUNKY LOFI HIP HOP (Chill Beats to Yare Yare Daze To) [6SxmlFORXmI].mp3" loop preload="auto" />
+      <audio ref={audioRef} src={tracks[currentTrackIndex].src} loop preload="auto" />
       <main className="flex-grow container mx-auto px-4 py-8 md:py-12">
         <div className="max-w-3xl mx-auto">
           <header className="text-center mb-8">
@@ -86,15 +111,24 @@ export default function StandConnectorPage() {
       </main>
       <footer className="text-center py-4 text-sm text-muted-foreground relative">
         <p>Powered by the inexplicable energy of Hamon and Google Gemini.</p>
-         <Button
-            variant="ghost"
-            size="icon"
-            className="absolute bottom-2 right-4"
-            onClick={toggleMusic}
-            aria-label={isPlaying ? 'Mute music' : 'Unmute music'}
-          >
-            {isPlaying ? <Music className="h-5 w-5 text-accent" /> : <VolumeX className="h-5 w-5 text-muted-foreground" />}
-          </Button>
+         <div className="absolute bottom-2 right-4 flex items-center gap-2">
+            <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleMusic}
+                aria-label={isPlaying ? 'Mute music' : 'Play music'}
+            >
+                {isPlaying ? <Music className="h-5 w-5 text-accent" /> : <VolumeX className="h-5 w-5 text-muted-foreground" />}
+            </Button>
+            <Button
+                variant="ghost"
+                size="icon"
+                onClick={playNextTrack}
+                aria-label="Next track"
+            >
+                <SkipForward className="h-5 w-5 text-muted-foreground hover:text-accent" />
+            </Button>
+         </div>
       </footer>
     </div>
   );
