@@ -56,7 +56,7 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
     <Card className="border-accent border-2 shadow-lg shadow-accent/10">
       <CardHeader>
         <CardTitle className="font-headline text-3xl text-accent">{result.connectionTitle}</CardTitle>
-        <CardDescription>Your personalized JoJo connection analysis is complete.</CardDescription>
+        <CardDescription>This must be the work of an enemy Stand!</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div>

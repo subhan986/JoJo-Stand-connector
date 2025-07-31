@@ -75,8 +75,8 @@ export default function InputForm({ onSubmit, isLoading }: InputFormProps) {
   return (
     <Card className="bg-card/50 backdrop-blur-sm">
       <CardHeader>
-        <CardTitle>Provide Your Input</CardTitle>
-        <CardDescription>Enter any concept, link, or file to start the analysis.</CardDescription>
+        <CardTitle>Awaken Your Stand</CardTitle>
+        <CardDescription>Present any concept, and I shall reveal its connection to the Joestar lineage.</CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="text" className="w-full" onValueChange={setActiveTab}>
@@ -88,7 +88,7 @@ export default function InputForm({ onSubmit, isLoading }: InputFormProps) {
           <form onSubmit={handleSubmit} className="mt-4">
             <TabsContent value="text">
                 <Textarea
-                    placeholder="e.g., 'The Mona Lisa', 'Quantum Physics', 'Taylor Swift'..."
+                    placeholder="e.g., 'The Mona Lisa', 'Your next line is...', 'A turtle with a key'"
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                     rows={5}
